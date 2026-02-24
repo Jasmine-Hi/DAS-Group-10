@@ -17,7 +17,7 @@ The main research questions are:
 ```{r}
 library(tidyverse)
 
-data <- read.csv("~/Desktop/data/DAProject10.csv")
+data <- read.csv("DAProject10.csv")  # Load dataset from project directory
 
 str(data)
 summary(data)

@@ -1,6 +1,6 @@
 ---
 title: "Project 10 – Obesity Prevalence"
-author: 
+author: Jasmine
 format: html
 ---
 
@@ -13,3 +13,154 @@ The main research questions are:
 
 1. Has obesity prevalence changed between 2008 and 2012?
 2. Is obesity associated with age, sex, and education level?
+
+```{r}
+library(tidyverse)
+
+data <- read.csv("~/Desktop/data/DAProject10.csv")
+
+str(data)
+summary(data)
+```
+```{r}
+table(data$BMIgroup)
+prop.table(table(data$BMIgroup))
+```
+
+
+# Convert categorical variables to factors
+# This ensures that logistic regression treats them as categorical predictors
+# and sets appropriate reference levels.
+data <- data %>%
+  mutate(
+    Sex = factor(Sex),
+    Education = factor(Education),
+    Year = factor(Year),
+    BMIgroup = factor(BMIgroup, levels = c("Underweight","Normal","Overweight","Obese"))
+  )
+
+
+
+# Create a binary obesity variable (1 = Obese, 0 = Not Obese)
+# This allows us to compute obesity prevalence by year
+obese_by_year <- data %>%
+  mutate(obese = (BMIgroup == "Obese")) %>%
+  group_by(Year) %>%                     # sample size per year
+  summarise(                             # proportion obese
+    n = n(),
+    obese_rate = mean(obese)
+  )
+
+obese_by_year
+
+
+# Plot obesity prevalence over time
+# Year is on the x-axis and obesity rate on the y-axis
+# group = 1 ensures points are connected across years
+ggplot(obese_by_year, aes(x = Year, y = obese_rate, group = 1)) +
+  geom_line() +
+  geom_point(size = 2) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Obesity Prevalence by Year",
+    y = "Obesity Rate",
+    x = "Year"
+  )
+
+
+# Chi-squared test of independence:
+# H0: BMI category (BMIgroup) is independent of survey year (Year)
+# H1: BMI category distribution differs across years
+chisq.test(table(data$BMIgroup, data$Year))
+
+
+# Create a binary outcome for logistic regression:
+# obese = 1 if BMIgroup is "Obese", otherwise 0
+data <- data %>%
+mutate(obese = as.integer(BMIgroup == "Obese"))
+
+
+# Logistic regression model:
+# Outcome: obesity status (1 = obese)
+# Predictors: Age, Sex, Education
+# Binomial family with logit link models log-odds of obesity
+fit_logit <- glm(obese ~ Age + Sex + Education,
+                 data = data,
+                 family = binomial)
+summary(fit_logit)
+exp(cbind(OR = coef(fit_logit), confint(fit_logit)))
+
+
+fit_logit2 <- glm(obese ~ Age + Sex + Education + Year,
+                  data = data,
+                  family = binomial)
+fit_logit2
+
+
+# Fit logistic regression model without Year
+# This model assesses whether Age, Sex, and Education
+# are associated with obesity
+fit_logit_without_year <- glm(
+  obese ~ Age + Sex + Education,
+  data = data,
+  family = binomial
+)
+
+# Fit logistic regression model including Year
+# This model tests whether Year provides additional
+# explanatory power beyond demographic variables
+fit_logit_with_year <- glm(
+  obese ~ Age + Sex + Education + Year,
+  data = data,
+  family = binomial
+)
+
+# Compare nested models using Likelihood Ratio Test
+# to assess whether adding Year significantly improves model fit
+anova(fit_logit_without_year, fit_logit_with_year, test="Chisq")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

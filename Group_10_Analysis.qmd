@@ -141,7 +141,7 @@ anova(fit_logit_without_year, fit_logit_with_year, test="Chisq")
 
 
 
-
+1111
 
 
 

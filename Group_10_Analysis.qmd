@@ -39,12 +39,17 @@ data <- data %>%
     BMIgroup = factor(BMIgroup, levels = c("Underweight","Normal","Overweight","Obese"))
   )
 
+# Converts age into categorical and make it a factor
+data$AgeGroup<-cut(data$Age, breaks=c(0,37,50,64,120),
+                   labels=c("0-37", "38-50", "51-64", "65+"))
+data <- data %>%
+  mutate(AgeGroup = as.factor(AgeGroup))
 
 
 # Create a binary obesity variable (1 = Obese, 0 = Not Obese)
 # This allows us to compute obesity prevalence by year
 obese_by_year <- data %>%
-  mutate(obese = (BMIgroup == "Obese")) %>%
+  mutate(Obese = (BMIgroup == "Obese")) %>%
   group_by(Year) %>%                     # sample size per year
   summarise(                             # proportion obese
     n = n(),
@@ -75,33 +80,70 @@ chisq.test(table(data$BMIgroup, data$Year))
 
 
 # Create a binary outcome for logistic regression:
-# obese = 1 if BMIgroup is "Obese", otherwise 0
-data <- data %>%
-mutate(obese = as.integer(BMIgroup == "Obese"))
+# obese = 1 if BMIgroup is "Obese", otherwise 0, then converts to a factor
+data<-data %>%
+  mutate(Obese=as.integer(BMIgroup=="Obese"))%>%
+  mutate(Obese=as.factor(Obese))
+
+# Q1 logistic regression model:
+fit_logit_only_year <- glm(Obese ~ Year,
+                 data = data,
+                 family = binomial)
+
+# Table of model summary with 2008 as a baseline
+fit_logit_only_year %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
+# All Year p-values greated than 0.05, so none are significant
+
+# Model formula
+# ln(p/1-p) = -0.87 + -0.04*I(Year=2009) + 0.04*I(Year=2010)
+
+# Point estimates of the log-odds
+plot_model(fit_logit_only_year, show.values = TRUE, transform = NULL,
+           title = "Log-Odds (Obese)", show.p = TRUE)
+
+# Probability of being obese by year with confidence intervals
+plot_model(fit_logit_only_year, 
+           type = "pred", 
+           title = "", 
+           terms="Year", 
+           axis.title = c("Year", "Prob. of being obese"))
+
+
+check_model(fit_logit_only_year, check = c("pp_check","binned_residuals","outliers","qq"))
+
+# Posterior predictive check (Top-left): 
+# Compares the observed data (number of obese vs not obese) against the predicted number
+# using simulated data. The values appear identical to predictions. 
+# 
+# Binned residuals (Top-right): 
+# Bin the observations based on their fitted values, and average the residual
+# value in each bin. The plots shows the average residual values versus the average 
+# fitted value for each bin. All residuals fall outside the error bounds
+# 
+# Influential observations (Bottom-left): 
+# This plot is used to identify influential observations. If any points in this plot
+# fall outside of Cook’s distance (the dashed lines) then it is considered an influential 
+# observation. All values fall within the dashed lines.
+# 
+# Uniformity of residuals (Bottom-right): 
+# Since our response is not normally distributed, residuals are not expected to be 
+# normally distributed either. Thus, we can use QQ plots to check the uniformity of
+# residuals. The values fall exactly along the line. 
+
 
 
 # Logistic regression model:
 # Outcome: obesity status (1 = obese)
 # Predictors: Age, Sex, Education
 # Binomial family with logit link models log-odds of obesity
-fit_logit <- glm(obese ~ Age + Sex + Education,
-                 data = data,
-                 family = binomial)
-summary(fit_logit)
-exp(cbind(OR = coef(fit_logit), confint(fit_logit)))
 
-
-fit_logit2 <- glm(obese ~ Age + Sex + Education + Year,
-                  data = data,
-                  family = binomial)
-fit_logit2
 
 
 # Fit logistic regression model without Year
 # This model assesses whether Age, Sex, and Education
 # are associated with obesity
 fit_logit_without_year <- glm(
-  obese ~ Age + Sex + Education,
+  Obese ~ AgeGroup + Sex + Education,
   data = data,
   family = binomial
 )
@@ -110,7 +152,7 @@ fit_logit_without_year <- glm(
 # This model tests whether Year provides additional
 # explanatory power beyond demographic variables
 fit_logit_with_year <- glm(
-  obese ~ Age + Sex + Education + Year,
+  Obese ~ AgeGroup + Sex + Education + Year,
   data = data,
   family = binomial
 )
@@ -118,6 +160,30 @@ fit_logit_with_year <- glm(
 # Compare nested models using Likelihood Ratio Test
 # to assess whether adding Year significantly improves model fit
 anova(fit_logit_without_year, fit_logit_with_year, test="Chisq")
+
+
+# Compare AIC, fit_logit_without_year is lowest
+AIC(fit_logit_without_year, fit_logit_with_year, fit_logit_only_year)
+
+# Table of model summary
+fit_logit_with_year %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
+
+# Table of model summary
+fit_logit_without_year %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
+# Sex[Male] has p-value 0.328, so is not significant
+
+
+# Fit final model witohut Year and Sex
+fit_logit_final <- glm(
+  Obese ~ AgeGroup + Education,
+  data = data,
+  family = binomial
+)
+
+# Table of final model summary
+fit_logit_final %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
+# All p-values are less than 0.05, so all are significant
+
 
 
 

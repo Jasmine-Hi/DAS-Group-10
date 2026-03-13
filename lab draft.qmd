@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-#Intro 
+##Intro 
 
 ## Exploratory Analysis
 
@@ -194,3 +194,4 @@ From @fig-1, we can see that the proportion of obese participants are similar fo
 
 From our exploratory analysis, we suspect that the prevalence of obesity is similar over the given years. As well as this, our exploratory analysis indicates there are some differences in obesity by age and socio-economic status or lifestyle factors, however there does not appear to be any major differences in obesity based on gender. We will investigate this further in our formal analysis.
 
+##Formal Analysis

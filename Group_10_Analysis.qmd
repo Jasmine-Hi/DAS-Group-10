@@ -21,12 +21,13 @@ library(sjPlot)
 library(broom)
 library(performance)
 library(yardstick)
-library(skimr)
+library(skimr) 
+library(janitor)
+library(kableExtra)
 
 data <- read.csv("DAProject10.csv")  # Load dataset from project directory
 
-str(data)
-summary(data)
+
 ```
 ```{r}
 table(data$BMIgroup)

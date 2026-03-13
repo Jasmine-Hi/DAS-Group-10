@@ -250,9 +250,307 @@ residuals. The values fall exactly along the line.
 ```{r}
 # Q2 formal analysis
 
+### Summary tables
+### By sex
+summary_q2_sex <- data %>%
+  summarise(
+    n = n(),
+    obese_n = sum(Obese == 1),
+    obese_prop = mean(Obese == 1),
+    non_obese_prop = mean(Obese == 0),
+    .by = Sex
+  )
 
-# Since all terms are categorical, fit the full model with multinomial, family = binomial
-model_full <- multinom(Obese ~ AgeGroup + Education + Sex, data = data, family = binomial)
+kable(
+  summary_q2_sex,
+  digits = 4,
+  col.names = c(
+    "Sex",
+    "Number of participants (total)",
+    "Number of participants (obese)",
+    "Proportion of participants (obese)",
+    "Proportion of participants (not obese)"
+  )
+)
+
+
+### By age group
+summary_q2_age <- data %>%
+  summarise(
+    n = n(),
+    obese_n = sum(Obese == 1),
+    obese_prop = mean(Obese == 1),
+    non_obese_prop = mean(Obese == 0),
+    .by = AgeGroup
+  )
+
+kable(
+  summary_q2_age,
+  digits = 4,
+  col.names = c(
+    "Age group",
+    "Number of participants (total)",
+    "Number of participants (obese)",
+    "Proportion of participants (obese)",
+    "Proportion of participants (not obese)"
+  )
+)
+
+
+### By education
+summary_q2_edu <- data %>%
+  summarise(
+    n = n(),
+    obese_n = sum(Obese == 1),
+    obese_prop = mean(Obese == 1),
+    non_obese_prop = mean(Obese == 0),
+    .by = Education
+  )
+
+kable(
+  summary_q2_edu,
+  digits = 4,
+  col.names = c(
+    "Education",
+    "Number of participants (total)",
+    "Number of participants (obese)",
+    "Proportion of participants (obese)",
+    "Proportion of participants (not obese)"
+  )
+)
+
+
+### By year
+summary_q2_year <- data %>%
+  summarise(
+    n = n(),
+    obese_n = sum(Obese == 1),
+    obese_prop = mean(Obese == 1),
+    non_obese_prop = mean(Obese == 0),
+    .by = Year
+  )
+
+kable(
+  summary_q2_year,
+  digits = 4,
+  col.names = c(
+    "Year",
+    "Number of participants (total)",
+    "Number of participants (obese)",
+    "Proportion of participants (obese)",
+    "Proportion of participants (not obese)"
+  )
+)
+
+### Boxplot
+### By sex
+ggplot(data, aes(x = Obese, group = Sex)) +
+  geom_bar(
+    aes(y = after_stat(prop), fill = Sex),
+    stat = "count",
+    position = "dodge"
+  ) +
+  labs(
+    y = "Proportion",
+    fill = "Sex",
+    x = "Obese (0 = no, 1 = yes)"
+  ) +
+  ggtitle("Barplot of obesity status by sex")
+
+
+### By age group
+ggplot(data, aes(x = Obese, group = AgeGroup)) +
+  geom_bar(
+    aes(y = after_stat(prop), fill = AgeGroup),
+    stat = "count",
+    position = "dodge"
+  ) +
+  labs(
+    y = "Proportion",
+    fill = "Age group",
+    x = "Obese (0 = no, 1 = yes)"
+  ) +
+  ggtitle("Barplot of obesity status by age group")
+
+
+### By education
+ggplot(data, aes(x = Obese, group = Education)) +
+  geom_bar(
+    aes(y = after_stat(prop), fill = Education),
+    stat = "count",
+    position = "dodge"
+  ) +
+  labs(
+    y = "Proportion",
+    fill = "Education",
+    x = "Obese (0 = no, 1 = yes)"
+  ) +
+  ggtitle("Barplot of obesity status by education")
+
+
+### By year
+ggplot(data, aes(x = Obese, group = Year)) +
+  geom_bar(
+    aes(y = after_stat(prop), fill = Year),
+    stat = "count",
+    position = "dodge"
+  ) +
+  labs(
+    y = "Proportion",
+    fill = "Year",
+    x = "Obese (0 = no, 1 = yes)"
+  ) +
+  ggtitle("Barplot of obesity status by year")
+
+### Formal analysis
+### Chi-square tests
+table_sex <- table(data$Sex, data$Obese)
+chisq_sex <- chisq.test(table_sex)
+
+table_age <- table(data$AgeGroup, data$Obese)
+chisq_age <- chisq.test(table_age)
+
+table_edu <- table(data$Education, data$Obese)
+chisq_edu <- chisq.test(table_edu)
+
+table_year <- table(data$Year, data$Obese)
+chisq_year <- chisq.test(table_year)
+
+chisq_sex
+chisq_age
+chisq_edu
+chisq_year
+
+
+### Binary logistic regression
+### Main model
+fit_logit_q2 <- glm(
+  Obese ~ AgeGroup + Education + Sex + Year,
+  data = data,
+  family = binomial
+)
+
+tab_model(
+  fit_logit_q2,
+  show.ci = 0.95,
+  show.aic = TRUE,
+  transform = NULL
+)
+
+tab_model(
+  fit_logit_q2,
+  show.ci = 0.95,
+  show.aic = TRUE,
+  transform = "exp"
+)
+
+### Reduced VS Full model comparison
+fit_logit_q2_full <- glm(
+  Obese ~ AgeGroup + Education + Sex + Year,
+  data = data,
+  family = binomial
+)
+
+tab_model(
+  fit_logit_q2_full,
+  show.ci = 0.95,
+  show.aic = TRUE,
+  transform = NULL
+)
+
+
+### Reduced model without Year
+fit_logit_q2_noyear <- glm(
+  Obese ~ AgeGroup + Education + Sex,
+  data = data,
+  family = binomial
+)
+
+fit_logit_q2_nosex <- glm(
+  Obese ~ AgeGroup + Education + Year,
+  data = data,
+  family = binomial
+)
+
+fit_logit_q2_noedu <- glm(
+  Obese ~ AgeGroup + Sex + Year,
+  data = data,
+  family = binomial
+)
+
+fit_logit_q2_noage <- glm(
+  Obese ~ Education + Sex + Year,
+  data = data,
+  family = binomial
+)
+
+anova(fit_logit_q2_noyear, fit_logit_q2_full, test = "Chisq")
+anova(fit_logit_q2_nosex, fit_logit_q2_full, test = "Chisq")
+anova(fit_logit_q2_noedu, fit_logit_q2_full, test = "Chisq")
+anova(fit_logit_q2_noage, fit_logit_q2_full, test = "Chisq")
+
+### compare
+AIC(
+  fit_logit_q2_full,
+  fit_logit_q2_noyear,
+  fit_logit_q2_nosex,
+  fit_logit_q2_noedu,
+  fit_logit_q2_noage
+)
+
+
+### Model checking
+check_model(
+  fit_logit_q2_full,
+  check = c("pp_check", "binned_residuals", "outliers", "qq")
+)
+
+### Predicted probabilities
+### Age group
+plot_model(
+  fit_logit_q2_full,
+  type = "pred",
+  terms = "AgeGroup",
+  title = "Predicted probability of obesity by age group",
+  axis.title = c("Age group", "Probability of obesity")
+)
+
+### Education
+plot_model(
+  fit_logit_q2_full,
+  type = "pred",
+  terms = "Education",
+  title = "Predicted probability of obesity by education",
+  axis.title = c("Education", "Probability of obesity")
+)
+
+### Sex
+plot_model(
+  fit_logit_q2_full,
+  type = "pred",
+  terms = "Sex",
+  title = "Predicted probability of obesity by sex",
+  axis.title = c("Sex", "Probability of obesity")
+)
+
+
+### Models for multiple categorical responses
+data$BMIgroup <- as.factor(data$BMIgroup)
+
+fit_multinom <- multinom(
+  BMIgroup ~ AgeGroup + Education + Sex + Year,
+  data = data
+)
+summary(fit_multinom)
+exp(coef(fit_multinom))
+fit_multinom %>% tab_model(transform = NULL)
+
+fit_multinom_noyear <- multinom(
+  BMIgroup ~ AgeGroup + Education + Sex,
+  data = data
+)
+fit_multinom_noyear %>% tab_model(transform = NULL)
+AIC(fit_multinom, fit_multinom_noyear)
 
 
 

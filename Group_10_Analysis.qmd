@@ -238,6 +238,11 @@ plot_model(type = "pred",
                           "Prob. of being obese", "Education"),
            title = "Plot of AgeGroup and Education coefficients")
 
+
+# Point estimates of the log-odds for the final model with AgeGroup and Education
+plot_model(fit_logit_final, show.values = TRUE, transform = NULL,
+           title = "Log-Odds (Obese)", show.p = TRUE)
+
 ```
 
 

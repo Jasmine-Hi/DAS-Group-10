@@ -58,19 +58,25 @@ data$AgeGroup<-cut(data$Age, breaks=c(0,37,50,64,120),
 data <- data %>%
   mutate(AgeGroup = as.factor(AgeGroup))
 
+# Create a binary outcome for logistic regression:
+# Obese = 1 if BMIgroup is "Obese", otherwise 0, then converts to a factor
+data<-data %>%
+  mutate(Obese=as.integer(BMIgroup=="Obese"))%>%
+  mutate(Obese=as.factor(Obese))
 
-# Create a binary obesity variable (1 = Obese, 0 = Not Obese)
-# This allows us to compute obesity prevalence by year
-obese_by_year <- data %>%
-  mutate(Obese = (BMIgroup == "Obese")) %>%
-  group_by(Year) %>%                     # sample size per year
-  summarise(                             # proportion obese
-    n = n(),
-    obese_rate = mean(Obese),
-    obese_num = obese_rate*n
-  )
 
-obese_by_year
+# # Create a binary obesity variable (1 = Obese, 0 = Not Obese)
+# # This allows us to compute obesity prevalence by year
+# obese_by_year <- data %>%
+#   mutate(Obese = (BMIgroup == "Obese")) %>%
+#   group_by(Year) %>%                     # sample size per year
+#   summarise(                             # proportion obese
+#     n = n(),
+#     obese_rate = mean(Obese),
+#     obese_num = obese_rate*n
+#   )
+# 
+# obese_by_year
 
 
 # # Plot obesity prevalence over time
@@ -86,17 +92,13 @@ obese_by_year
 #     x = "Year"
 #   )
 
-# Chi-squared test of independence:
-# H0: BMI category (BMIgroup) is independent of survey year (Year)
-# H1: BMI category distribution differs across years
-chisq.test(table(data$BMIgroup, data$Year))
+
+# # Chi-squared test of independence:
+# # H0: BMI category (BMIgroup) is independent of survey year (Year)
+# # H1: BMI category distribution differs across years
+# chisq.test(table(data$BMIgroup, data$Year))
 
 
-# Create a binary outcome for logistic regression:
-# Obese = 1 if BMIgroup is "Obese", otherwise 0, then converts to a factor
-data<-data %>%
-  mutate(Obese=as.integer(BMIgroup=="Obese"))%>%
-  mutate(Obese=as.factor(Obese))
 
 # # Bar plot of obesity prevalence over time
 # # Year is on the x-axis and obesity rate on the y-axis
@@ -202,7 +204,7 @@ fit_logit_without_year %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = 
 # Sex[Male] has p-value 0.328, so is not significant
 
 
-# Fit final model witohut Year and Sex
+# Fit final model without Year and Sex
 fit_logit_final <- glm(
   Obese ~ AgeGroup + Education,
   data = data,

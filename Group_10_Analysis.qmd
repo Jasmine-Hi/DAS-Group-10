@@ -243,6 +243,11 @@ plot_model(type = "pred",
 plot_model(fit_logit_final, show.values = TRUE, transform = NULL,
            title = "Log-Odds (Obese)", show.p = TRUE)
 
+
+check_model(fit_logit_final, check = c("pp_check","binned_residuals","outliers","qq"))
+# Binned residuals plot has most values outside error bounds
+# All other plots satisfy the assumptions
+
 ```
 
 

@@ -216,6 +216,28 @@ fit_logit_final %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
 # All p-values are less than 0.05, so all are significant
 
 
+
+plot_model(type = "pred",
+           fit_logit_final,
+           terms = "Education",
+           axis.title = c("Education Category",
+                          "Prob. of being obese"),
+           title = "Plot of Education coefficients")
+
+plot_model(type = "pred",
+           fit_logit_final,
+           terms = "AgeGroup",
+           axis.title = c("Age Group",
+                          "Prob. of being obese"),
+           title = "Plot of AgeGroup coefficients")
+
+plot_model(type = "pred",
+           fit_logit_final,
+           terms = c("AgeGroup", "Education"),
+           axis.title = c("Age Group",
+                          "Prob. of being obese", "Education"),
+           title = "Plot of AgeGroup and Education coefficients")
+
 ```
 
 

@@ -169,24 +169,51 @@ residuals. The values fall exactly along the line.
 # Binomial family with logit link models log-odds of obesity
 
 
+# Since all terms are categorical, fit the full model with multinomial, family = binomial
+model_full <- multinom(Obese ~ AgeGroup + Education + Sex, data = data, family = binomial)
 
-# Fit logistic regression model without Year
-# This model assesses whether Age, Sex, and Education
-# are associated with obesity
-fit_logit_without_year <- glm(
-  Obese ~ AgeGroup + Sex + Education,
-  data = data,
-  family = binomial
-)
+# Table of full model summary
+model_full %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
+# Sex has p-value>0.05, so is removed
 
-# Fit logistic regression model including Year
-# This model tests whether Year provides additional
-# explanatory power beyond demographic variables
-fit_logit_with_year <- glm(
-  Obese ~ AgeGroup + Sex + Education + Year,
-  data = data,
-  family = binomial
-)
+# Fit the final model, without Sex
+model_final <- multinom(Obese ~ AgeGroup + Education, data = data, family = binomial)
+
+# Table of final model summary
+model_final %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
+# All p-values<0.05, so the final model is good
+
+# Compare performance of model_final and model_full
+compare_performance(model_final,model_full,metrics = "AIC")
+# model_final has lower AIC
+
+# Log-odds for model_final
+plot_model(model_final, show.values = TRUE, transform = NULL,
+           title = "Log-Odds (Obese)", show.p = TRUE)
+
+check_model
+
+
+
+
+# # Fit logistic regression model without Year
+# # This model assesses whether Age, Sex, and Education
+# # are associated with obesity
+# fit_logit_without_year <- glm(
+#   Obese ~ AgeGroup + Sex + Education,
+#   data = data,
+#   family = binomial
+# )
+
+
+# # Fit logistic regression model including Year
+# # This model tests whether Year provides additional
+# # explanatory power beyond demographic variables
+# fit_logit_with_year <- glm(
+#   Obese ~ AgeGroup + Sex + Education + Year,
+#   data = data,
+#   family = binomial
+# )
 
 # Compare nested models using Likelihood Ratio Test
 # to assess whether adding Year significantly improves model fit
@@ -196,8 +223,7 @@ anova(fit_logit_without_year, fit_logit_with_year, test="Chisq")
 # Compare AIC, fit_logit_without_year is lowest
 AIC(fit_logit_without_year, fit_logit_with_year, fit_logit_only_year)
 
-# Table of model summary
-fit_logit_with_year %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
+
 
 # Table of model summary
 fit_logit_without_year %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)

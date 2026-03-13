@@ -15,6 +15,10 @@ The main research questions are:
 2. Is obesity associated with age, sex, and education level?
 
 ```{r}
+#| echo: false 
+#| warning: false
+#| message: false
+
 library(tidyverse)
 library(ggplot2)
 library(sjPlot)
@@ -27,8 +31,10 @@ library(kableExtra)
 
 data <- read.csv("DAProject10.csv")  # Load dataset from project directory
 
-
 ```
+
+
+
 ```{r}
 table(data$BMIgroup)
 prop.table(table(data$BMIgroup))

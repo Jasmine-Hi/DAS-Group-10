@@ -73,19 +73,18 @@ obese_by_year <- data %>%
 obese_by_year
 
 
-# Plot obesity prevalence over time
-# Year is on the x-axis and obesity rate on the y-axis
-# group = 1 ensures points are connected across years
-ggplot(obese_by_year, aes(x = Year, y = obese_rate, group = 1)) +
-  geom_line() +
-  geom_point(size = 2) +
-  scale_y_continuous(labels = scales::percent_format()) +
-  labs(
-    title = "Obesity Prevalence by Year",
-    y = "Obesity Rate",
-    x = "Year"
-  )
-
+# # Plot obesity prevalence over time
+# # Year is on the x-axis and obesity rate on the y-axis
+# # group = 1 ensures points are connected across years
+# ggplot(obese_by_year, aes(x = Year, y = obese_rate, group = 1)) +
+#   geom_line() +
+#   geom_point(size = 2) +
+#   scale_y_continuous(labels = scales::percent_format()) +
+#   labs(
+#     title = "Obesity Prevalence by Year",
+#     y = "Obesity Rate",
+#     x = "Year"
+#   )
 
 # Chi-squared test of independence:
 # H0: BMI category (BMIgroup) is independent of survey year (Year)
@@ -99,10 +98,10 @@ data<-data %>%
   mutate(Obese=as.integer(BMIgroup=="Obese"))%>%
   mutate(Obese=as.factor(Obese))
 
-# Bar plot of obesity prevalence over time
-# Year is on the x-axis and obesity rate on the y-axis
-ggplot(data, aes(x=Year, fill=Obese))+
-  geom_bar()
+# # Bar plot of obesity prevalence over time
+# # Year is on the x-axis and obesity rate on the y-axis
+# ggplot(data, aes(x=Year, fill=Obese))+
+#   geom_bar()
 
 # Bar plot of obesity proportion by year
 ggplot(data, aes(x = Obese, group = Year)) +

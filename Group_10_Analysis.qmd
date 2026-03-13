@@ -60,7 +60,8 @@ obese_by_year <- data %>%
   group_by(Year) %>%                     # sample size per year
   summarise(                             # proportion obese
     n = n(),
-    obese_rate = mean(Obese)
+    obese_rate = mean(Obese),
+    obese_num = obese_rate*n
   )
 
 obese_by_year
@@ -96,6 +97,15 @@ data<-data %>%
 # Year is on the x-axis and obesity rate on the y-axis
 ggplot(data, aes(x=Year, fill=Obese))+
   geom_bar()
+
+# Bar plot of obesity proportion by year
+ggplot(data, aes(x = Obese, group = Year)) +
+  geom_bar(aes(y = after_stat(prop), fill = Year), 
+           stat = "count", position = "dodge") +
+  labs(y = "Proportion", fill = "Year",
+       x="Obese (0-no, 1-yes)")+ 
+  ggtitle("Barplot of obesity status by year")
+
 
 # Q1 logistic regression model:
 fit_logit_only_year <- glm(Obese ~ Year,

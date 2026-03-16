@@ -1,0 +1,207 @@
+---
+title: "Final Draft"
+format: 
+  pdf:
+    fontsize: 10pt
+    include-in-header: 
+      text: |
+        \usepackage{float}
+---
+
+## Introduction
+
+## Exploratory analysis
+
+Prior to performing any analysis, we will first look at our Age variable.
+
+```{r}
+#| echo: false 
+#| warning: false
+#| message: false 
+
+library(tidyverse)
+library(ggplot2)
+library(sjPlot)
+library(broom)
+library(performance)
+library(yardstick)
+library(skimr)
+library(janitor)
+library(kableExtra) 
+library(nnet) 
+
+data<-read.csv("DAProject10.csv") 
+
+
+data<-data%>% 
+  mutate(Obese=as.integer(BMIgroup=="Obese"))%>%
+  mutate(Obese=as.factor(Obese), Year=as.factor(Year),
+         Sex=as.factor(Sex), Education=as.factor(Education)) 
+
+data$AgeGroup<-cut(data$Age, breaks=c(0,37,50,64,120),
+                   labels=c("0-37","38-50","51-64", "65+"))
+
+data<-data%>%
+  mutate(AgeGroup=as.factor(AgeGroup))
+
+```
+
+```{r}
+#| label: tbl-table_1
+#| tbl-cap: "Table of distribution for age variable"  
+#| echo: false 
+
+age.summary<-summary(data$Age)
+age_table<-as.data.frame(t(as.matrix(age.summary))) 
+kable(age_table)
+```
+
+We will split our age variable into 4 groups based on the quartiles displayed in @tbl-table_1. Hence, our age groups are as follows: 0-37, 38-50, 51-64 and 65+.
+
+The plots below are barplots of the proportion of obese participants grouped by different categorical variables: Year, Sex, Age Group and Education.
+
+::: {layout-ncol="2" fig-pos="H" fig-height="3" fig-width="4"}
+```{r}
+#| echo: false 
+#| fig-cap: "Barplot of obesity status by year" 
+#| label: fig-1
+
+ggplot(data, aes(x = Obese, group = Year)) +
+    geom_bar(aes(y = after_stat(prop), fill = Year), 
+             stat = "count", position = "dodge") +
+    labs(y = "Proportion", fill = "Year",
+         x="Obese (0-no, 1-yes)")+ 
+  ggtitle("Barplot of obesity status by year")
+
+```
+
+```{r}
+#| echo: false 
+#| fig-cap: "Barplot of obesity status by Sex" 
+#| label: fig-2 
+
+ggplot(data, aes(x = Obese, group = Sex)) +
+    geom_bar(aes(y = after_stat(prop), fill = Sex), 
+             stat = "count", position = "dodge") +
+    labs(y = "Proportion", fill = "Sex",
+         x="Obese (0-no, 1-yes)")+ 
+  ggtitle("Barplot of obesity status by Sex")
+
+```
+
+```{r}
+#| echo: false 
+#| fig-cap: "Barplot of obesity status by Age Group" 
+#| label: fig-3
+
+ggplot(data, aes(x = Obese, group = AgeGroup)) +
+    geom_bar(aes(y = after_stat(prop), fill = AgeGroup), 
+             stat = "count", position = "dodge") +
+    labs(y = "Proportion", fill = "Age Group",
+         x="Obese (0-no, 1-yes)")+ 
+  ggtitle("Barplot of obesity status by age group")
+```
+
+```{r}
+#| echo: false 
+#| fig-cap: "Barplot of obesity status by Education" 
+#| label: fig-4 
+
+ggplot(data, aes(x = Obese, group = Education)) +
+    geom_bar(aes(y = after_stat(prop), fill = Education), 
+             stat = "count", position = "dodge") +
+    labs(y = "Proportion", fill = "Education",
+         x="Obese (0-no, 1-yes)")+ 
+  ggtitle("Barplot of obesity status by Education")
+```
+:::
+
+From @fig-1, we can see that the proportion of obese participants are similar for each year of the Scottish Health Study, however, in 2010, the proportion of obese participants is slightly larger than the other years. It appears that the proportion of obese participants is around 30% for all years. Similar can be said regarding @fig-2 , the proportion of obese participants is very similar for both males and females, however is marginally higher for female participants. @fig-3 implies that there is a difference between the proportion of obese participants across age groups, participants of ages 51-64 have the highest obesity proportion (around 35%), and those of ages 0-37 have the lowest (around 20%). @fig-4 also indicates a difference in obesity proportions for those of different education levels. Those who have no qualifications have the highest proportion of obesity (around 36%), and those with a degree or higher have the lowest (around 25%).
+
+From our exploratory analysis, we suspect that the prevalence of obesity is similar over the given years. As well as this, our exploratory analysis indicates there are some differences in obesity by age and socio-economic status or lifestyle factors, however there does not appear to be any major differences in obesity based on gender. We will investigate this further in our formal analysis.
+
+## Formal Analysis
+
+### Question 1 
+
+*Insert general formula for model and distribution of* $y_i$ *from notes, as well as list of meaning of each variable.*
+
+```{r}
+#| tbl-cap: "Model summary with 2008 as baseline"
+#| label: tbl-table_6
+#| echo: false  
+#| message: false 
+#| fig-pos: "H"
+
+fit_logit_only_year <- glm(Obese ~ Year,
+                 data = data,
+                 family = binomial)
+
+
+# Table of model summary with 2008 as a baseline
+fit_logit_only_year %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
+# All Year p-values greated than 0.05, so none are significant
+
+```
+
+**Fitted Formula:**
+
+$$
+\ln(\frac{p}{1-p}) = -0.87 + -0.04\cdot \mathbb{I}(\text{Year}=2009) + 0.04\cdot \mathbb I(\text{Year}=2010)
+$$*Insert interpretation of odds for each year and analysis of p-values.*
+
+::: {layout-ncol="2" fig-pos="H" fig-height="3" fig-width="4"}
+```{r}
+#| echo: false 
+#| fig-cap: "Point Estimates of log-odds" 
+#| label: fig-5 
+#| message: false 
+#| warning: false 
+
+plot_model(fit_logit_only_year, show.values = TRUE, transform = NULL,
+           title = "Log-Odds (Obese)", show.p = TRUE)
+
+```
+
+```{r}
+#| echo: false 
+#| fig-cap: "Prob of being obese by year with CIs" 
+#| label: fig-6
+#| message: false 
+#| warning: false 
+#| fig-align: center
+
+plot_model(fit_logit_only_year, 
+           type = "pred", 
+           title = "", 
+           terms="Year", 
+           axis.title = c("Year", "Prob. of being obese"))
+
+```
+:::
+
+*Insert comments on plots in relation to prev analysis.*
+
+```{r}
+#| echo: false 
+#| fig-cap: "Model Checks" 
+#| label: fig-7
+#| message: false 
+#| warning: false 
+#| fig-align: center
+#| fig-height: 6
+#| fig-width: 8
+#| fig-pos: "H"
+
+check_model(fit_logit_only_year, check = c("pp_check","binned_residuals","outliers","qq"))
+```
+
+Posterior predictive check (Top-left): Compares the observed data (number of obese vs not obese) against the predicted number using simulated data. The values appear identical to predictions.
+
+Binned residuals (Top-right): Bin the observations based on their fitted values, and average the residual value in each bin. The plots shows the average residual values versus the average fitted value for each bin. All residuals fall outside the error bounds
+
+Influential observations (Bottom-left): This plot is used to identify influential observations. If any points in this plot fall outside of Cook’s distance (the dashed lines) then it is considered an influential observation. All values fall within the dashed lines.
+
+Uniformity of residuals (Bottom-right): Since our response is not normally distributed, residuals are not expected to be normally distributed either. Thus, we can use QQ plots to check the uniformity of residuals. The values fall exactly along the line.
+
+### Question 2

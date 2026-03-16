@@ -9,7 +9,7 @@ format:
 ---
 
 ## Introduction
-Obesity is a significant public health concern due to its association with various long-term health conditions and increased pressure on healthcare systems. The Scottish Health Survey monitors the health of individuals living in private households in Scotland and provides data that can be used to examine trends in obesity over time. This analysis uses data from the 2008-2012 surveys, including information of age, sex, education, and BMI classification. A binary obesity variable was created from the BMIgroup variable. The aim of this report is to investigate whether obesity prevalence has changed across survey years and whether it differs by demographic characteristics such as age, gender, and education. 
+Obesity is a significant public health concern due to its association with various long-term health conditions and increased pressure on healthcare systems. The Scottish Health Survey monitors the health of individuals living in private households in Scotland and provides data that can be used to examine trends in obesity over time. This analysis uses data from the 2008-2012 surveys, including information on age, sex, education, and BMI classification. A binary obesity variable was created from the BMIgroup variable. The aim of this report is to investigate whether obesity prevalence has changed across survey years and whether it differs by demographic characteristics such as age, gender, and education. 
 ## Exploratory analysis
 
 Prior to performing any analysis, we will first look at our Age variable.

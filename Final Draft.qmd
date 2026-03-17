@@ -58,7 +58,9 @@ kable(age_table)
 
 We will split our age variable into 4 groups based on the quartiles displayed in @tbl-table_1. Hence, our age groups are as follows: 0-37, 38-50, 51-64 and 65+.
 
-The plots below are barplots of the proportion of obese participants grouped by different categorical variables: Year, Sex, Age Group and Education.
+The plots below are barplots of the proportion of obese participants grouped by different categorical variables: Year, Sex, Age Group and Education. 
+
+From @fig-1, we can see that the proportion of obese participants are similar for each year of the Scottish Health Study, however, in 2010, the proportion of obese participants is slightly larger than the other years. It appears that the proportion of obese participants is around 30% for all years. Similar can be said regarding @fig-2 , the proportion of obese participants is very similar for both males and females, however is marginally higher for female participants. @fig-3 implies that there is a difference between the proportion of obese participants across age groups, participants of ages 51-64 have the highest obesity proportion (around 35%), and those of ages 0-37 have the lowest (around 20%). @fig-4 also indicates a difference in obesity proportions for those of different education levels. Those who have no qualifications have the highest proportion of obesity (around 36%), and those with a degree or higher have the lowest (around 25%).
 
 ::: {layout-ncol="2" fig-pos="H" fig-height="3" fig-width="4"}
 ```{r}
@@ -116,7 +118,7 @@ ggplot(data, aes(x = Obese, group = Education)) +
 ```
 :::
 
-From @fig-1, we can see that the proportion of obese participants are similar for each year of the Scottish Health Study, however, in 2010, the proportion of obese participants is slightly larger than the other years. It appears that the proportion of obese participants is around 30% for all years. Similar can be said regarding @fig-2 , the proportion of obese participants is very similar for both males and females, however is marginally higher for female participants. @fig-3 implies that there is a difference between the proportion of obese participants across age groups, participants of ages 51-64 have the highest obesity proportion (around 35%), and those of ages 0-37 have the lowest (around 20%). @fig-4 also indicates a difference in obesity proportions for those of different education levels. Those who have no qualifications have the highest proportion of obesity (around 36%), and those with a degree or higher have the lowest (around 25%).
+
 
 From our exploratory analysis, we suspect that the prevalence of obesity is similar over the given years. As well as this, our exploratory analysis indicates there are some differences in obesity by age and socio-economic status or lifestyle factors, however there does not appear to be any major differences in obesity based on gender. We will investigate this further in our formal analysis.
 

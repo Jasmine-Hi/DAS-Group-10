@@ -180,6 +180,7 @@ plot_model(fit_logit_only_year,
            axis.title = c("Year", "Prob. of being obese"))
 
 ```
+:::
 
 @fig-5 displays the estimated log-odds of obesity for each year relative to the baseline year. The estimates are all close to zero and their confidence intervals overlap considerably, supporting the conclusion that there are no meaningful differences between years. @fig-6 shows the predicted probability of obesity for each survey year. The predicted probabilities remain relatively stable across years, ranging from approximately 28% to 31%, which is consistent with the exploratory analysis.
 

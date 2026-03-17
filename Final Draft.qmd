@@ -152,7 +152,7 @@ $$
 \ln(\frac{p}{1-p}) = -0.87 + -0.04\cdot \mathbb{I}(\text{Year}=2009) + 0.04\cdot \mathbb I(\text{Year}=2010) + 0.00\cdot \mathbb I(\text{Year}=2011) + 0.00\cdot \mathbb I(\text{Year}=2012)
 $$
 
-The fitted model estimates the log-odds of obesity in each year relative to 2008. The intercept of -0.87 represents the log-odds of obesity in 2008. The coefficient for 2009 is -0.04, indicating slightly lower log-odds of obesity than in 2008, while the coefficient for 2010 is 0.04, indicating slightly higher log-odds. The coefficients for 2011 and 2012 are both approximately 0.00, suggesting almost no difference relative to 2008. However, all p-values are greater than 0.05, so none of these year effects are statistically significant. Therefore, there is no evidence that obesity prevalence differed significantly across the survey years considered. ::: {layout-ncol="2" fig-pos="H" fig-height="3" fig-width="4"}
+The fitted model estimates the log-odds of obesity in each year relative to 2008. The intercept of -0.87 represents the log-odds of obesity in 2008. The coefficient for 2009 is -0.04, indicating slightly lower log-odds of obesity than in 2008, while the coefficient for 2010 is 0.04, indicating slightly higher log-odds. The coefficients for 2011 and 2012 are both approximately 0.00, suggesting almost no difference relative to 2008. However, all p-values are greater than 0.05, so none of these year effects are statistically significant. Therefore, there is no evidence that obesity prevalence differed significantly across the survey years considered. 
 
 ::: {layout-ncol="2" fig-pos="H" fig-height="3" fig-width="4"}
 ```{r}

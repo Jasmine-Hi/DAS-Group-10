@@ -248,43 +248,24 @@ residuals. The values fall exactly along the line.
 
 
 ```{r}
-# Q2 formal analysis
+# ================================
+# Q2 Formal Analysis
+# Binary Logistic Regression
+# ================================
 
-### Formal analysis
-### Chi-square tests
-table_sex <- table(data$Sex, data$Obese)
-chisq_sex <- chisq.test(table_sex)
-
-table_age <- table(data$AgeGroup, data$Obese)
-chisq_age <- chisq.test(table_age)
-
-table_edu <- table(data$Education, data$Obese)
-chisq_edu <- chisq.test(table_edu)
-
-table_year <- table(data$Year, data$Obese)
-chisq_year <- chisq.test(table_year)
-
-chisq_sex
-chisq_age
-chisq_edu
-chisq_year
-
-
-### Binary logistic regression
-### Main model
+# Fit the main logistic regression model
+# Response: Obese (binary outcome)
+# Predictors: AgeGroup, Education, Sex
 fit_logit_q2 <- glm(
-  Obese ~ AgeGroup + Education + Sex + Year,
+  Obese ~ AgeGroup + Education + Sex,
   data = data,
   family = binomial
 )
 
-tab_model(
-  fit_logit_q2,
-  show.ci = 0.95,
-  show.aic = TRUE,
-  transform = NULL
-)
-
+# Display model results:
+# - transform = "exp" converts log-odds to odds ratios
+# - show.ci = 0.95 displays 95% confidence intervals
+# - show.aic = TRUE reports AIC for model comparison
 tab_model(
   fit_logit_q2,
   show.ci = 0.95,
@@ -292,62 +273,66 @@ tab_model(
   transform = "exp"
 )
 
-### Reduced VS Full model comparison
+### Model comparison using likelihood ratio tests (ANOVA)
+# Full model (all predictors included)
 fit_logit_q2_full <- glm(
-  Obese ~ AgeGroup + Education + Sex + Year,
-  data = data,
-  family = binomial
-)
-
-tab_model(
-  fit_logit_q2_full,
-  show.ci = 0.95,
-  show.aic = TRUE,
-  transform = NULL
-)
-
-
-### Reduced model without Year
-fit_logit_q2_noyear <- glm(
   Obese ~ AgeGroup + Education + Sex,
   data = data,
   family = binomial
 )
 
+# Null model (intercept only, no predictors)
+fit_logit_q2_null <- glm(
+  Obese ~ 1,
+  data = data,
+  family = binomial
+)
+
+### Reduced model without Year
 fit_logit_q2_nosex <- glm(
-  Obese ~ AgeGroup + Education + Year,
+  Obese ~ AgeGroup + Education,
   data = data,
   family = binomial
 )
 
 fit_logit_q2_noedu <- glm(
-  Obese ~ AgeGroup + Sex + Year,
+  Obese ~ AgeGroup + Sex,
   data = data,
   family = binomial
 )
 
 fit_logit_q2_noage <- glm(
-  Obese ~ Education + Sex + Year,
+  Obese ~ Education + Sex,
   data = data,
   family = binomial
 )
 
-anova(fit_logit_q2_noyear, fit_logit_q2_full, test = "Chisq")
+# Likelihood ratio test:
+# Compare each reduced model to the full model
+# to assess whether the removed variable is significant
+anova(fit_logit_q2_null, fit_logit_q2_full, test = "Chisq")
 anova(fit_logit_q2_nosex, fit_logit_q2_full, test = "Chisq")
 anova(fit_logit_q2_noedu, fit_logit_q2_full, test = "Chisq")
 anova(fit_logit_q2_noage, fit_logit_q2_full, test = "Chisq")
 
-### compare
+### Model comparison using AIC
+# Compare model fit using Akaike Information Criterion (AIC)
+# Lower AIC indicates a better trade-off between fit and complexity
 AIC(
   fit_logit_q2_full,
-  fit_logit_q2_noyear,
   fit_logit_q2_nosex,
   fit_logit_q2_noedu,
   fit_logit_q2_noage
 )
 
 
-### Model checking
+### Model diagnostics
+
+# Check model assumptions and fit:
+# - Posterior predictive check
+# - Binned residuals
+# - Outliers (influential observations)
+# - QQ plot for residual distribution
 check_model(
   fit_logit_q2_full,
   check = c("pp_check", "binned_residuals", "outliers", "qq")
@@ -355,6 +340,7 @@ check_model(
 
 ### Predicted probabilities
 ### Age group
+### The difference in Age is the greast; can keep only Age 
 plot_model(
   fit_logit_q2_full,
   type = "pred",
@@ -382,23 +368,29 @@ plot_model(
 )
 
 
-### Models for multiple categorical responses
+### (Optional) Multinomial logistic regression
+### This section treats BMIgroup as a multi-category outcome
+
+# Convert BMIgroup to factor (required for multinom)
 data$BMIgroup <- as.factor(data$BMIgroup)
 
+# Full multinomial model including Year
 fit_multinom <- multinom(
   BMIgroup ~ AgeGroup + Education + Sex + Year,
   data = data
 )
-summary(fit_multinom)
-exp(coef(fit_multinom))
-fit_multinom %>% tab_model(transform = NULL)
+summary(fit_multinom)  # Display coefficients (log-odds)
+exp(coef(fit_multinom))  # Convert coefficients to relative risk ratios
+fit_multinom %>% tab_model(transform = NULL)  # Display model in table format
 
+# Reduced multinomial model (excluding Year)
 fit_multinom_noyear <- multinom(
   BMIgroup ~ AgeGroup + Education + Sex,
   data = data
 )
 fit_multinom_noyear %>% tab_model(transform = NULL)
-AIC(fit_multinom, fit_multinom_noyear)
+AIC(fit_multinom, fit_multinom_noyear) # Compare multinomial models using AIC
+
 
 
 

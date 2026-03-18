@@ -10,6 +10,7 @@ format:
 
 ## Introduction
 Obesity is a significant public health concern due to its association with various long-term health conditions and increased pressure on healthcare systems. The Scottish Health Survey monitors the health of individuals living in private households in Scotland and provides data that can be used to examine trends in obesity over time. This analysis uses data from the 2008-2012 surveys, including information on age, sex, education, and BMI classification. A binary obesity variable was created from the BMIgroup variable. The aim of this report is to investigate whether obesity prevalence has changed across survey years and whether it differs by demographic characteristics such as age, gender, and education. 
+
 ## Exploratory analysis
 
 Prior to performing any analysis, we will first look at our Age variable.
@@ -188,17 +189,18 @@ plot_model(fit_logit_only_year,
 
 ```{r}
 #| echo: false 
-#| fig-cap: "Model Checks" 
-#| label: fig-7
-#| message: false 
-#| warning: false 
+#| tbl-cap: "ANOVA Table" 
+#| label: tbl-table_3
+#| warning: false
 #| fig-align: center
-#| fig-height: 6
-#| fig-width: 8
-#| fig-pos: "H"
+#| fig-pos: "H" 
 
-check_model(fit_logit_only_year, check = c("pp_check","binned_residuals","outliers","qq"))
+model_null<-glm(Obese~1, data=data, family=binomial) 
+
+anova1<-anova(model_null, fit_logit_only_year, test="Chisq") 
+
+kable(anova1)
 ```
-Model diagnostic plots were used to assess the adequacy of the logistic regression model. The posterior predictive check compares observed and predicted counts and suggests that the model reproduces the data reasonably well. The influence plot indicates that no observations exceed Cook’s distance thresholds, suggesting there are no influential data points affecting the model estimates. Overall, the diagnostic plots do not indicate any major issues with model fit.
+@tbl-table_3 depicts the Analysis of Variance table, comparing the performance of the null model against the model with obesity as a predictor variable. From this, we can see that the addition of year as a predictor variable reduces the deviance by 3.82, which in a data set of 25224 individuals does not appear to be a significant decrease. This, paired with our p-value of 0.43, suggests the year of the study is not a statistically significant predictor of obesity. Indicating that the prevalence of obesity in Scotland has not changed substantially over the given years of the Scottish health survey.   
 
 ### Question 2

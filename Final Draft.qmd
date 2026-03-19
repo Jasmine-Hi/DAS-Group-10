@@ -201,6 +201,160 @@ anova1<-anova(model_null, fit_logit_only_year, test="Chisq")
 
 kable(anova1)
 ```
-@tbl-table_3 depicts the Analysis of Variance table, comparing the performance of the null model against the model with obesity as a predictor variable. From this, we can see that the addition of year as a predictor variable reduces the deviance by 3.82, which in a data set of 25224 individuals does not appear to be a significant decrease. This, paired with our p-value of 0.43, suggests the year of the study is not a statistically significant predictor of obesity. Indicating that the prevalence of obesity in Scotland has not changed substantially over the given years of the Scottish health survey.   
+@tbl-table_3 depicts the Analysis of Variance table, comparing the performance of the null model against the model with obesity as a predictor variable. From this, we can see that the addition of year as a predictor variable reduces the deviance by 3.82, which in a data set of 25224 individuals does not appear to be a significant decrease. This, paired with our p-value of 0.43, suggests the year of the study is not a statistically significant predictor of obesity. Indicating that the prevalence of obesity in Scotland has not changed substantially over the given years of the Scottish health survey. 
 
-### Question 2
+```{r}
+#| echo: false 
+#| fig-cap: "ROC curve" 
+#| label: fig-7
+#| message: false 
+#| warning: false 
+#| fig-align: center 
+#| fig-height: 2
+#| fig-width: 2
+
+pred_results1 <- fit_logit_only_year %>% 
+  broom::augment(type.predict = "response") %>% 
+  mutate(predicted_class = factor(ifelse(.fitted > 0.5, "Obese", "Not Obese"), levels = levels(Obese))) 
+
+roc_curve(pred_results1,
+          truth=Obese, 
+          .fitted,
+          event_level="second")%>%
+  autoplot()
+```
+
+*Since the ROC curve is on the diagonal line, the performance of the model is no better than random guessing*  
+
+
+### Question 2 
+
+
+*Insert General formula for model* 
+```{r}
+#| tbl-cap: "Model summary of Obesity with Agegroup, Sex and Education"
+#| label: tbl-table_4
+#| echo: false  
+#| message: false 
+#| fig-pos: "H"
+
+#Logistic regression model with all variables 
+
+fit_logit_q2 <- glm(
+  Obese ~ AgeGroup + Education + Sex,
+  data = data,
+  family = binomial
+)
+
+#Table of Full model 
+
+tab_model(
+  fit_logit_q2,
+  show.ci = 0.95,
+  show.aic = TRUE,
+  transform = "exp"
+)
+
+
+```
+
+*Since p-value of Sex[Male] is greater than 0.05, will remove from model, will then compare the AIC of each model to determine which is best* 
+
+:::layout(ncol="2")
+```{r}
+#| tbl-cap: "ANOVA table to check if removed variable is significant "
+#| label: tbl-table_5
+#| echo: false  
+#| message: false 
+#| fig-pos: "H"  
+
+# Null model (intercept only, no predictors)
+fit_logit_q2_null <- glm(
+  Obese ~ 1,
+  data = data,
+  family = binomial
+)
+
+#Model with sex removed
+fit_logit_q2_nosex <- glm(
+  Obese ~ AgeGroup + Education,
+  data = data,
+  family = binomial
+)
+
+anovatable<-anova(fit_logit_q2_null, fit_logit_q2, fit_logit_q2_nosex, test = "Chisq")
+kable(anovatable)
+
+```
+
+```{r}
+#| tbl-cap: "Table comparing AIC values of null model, full model and reduced model (without Sex)"
+#| label: tbl-table_6
+#| echo: false  
+#| message: false 
+#| fig-pos: "H" 
+
+
+AICs<-AIC(
+  fit_logit_q2_null,
+  fit_logit_q2,
+  fit_logit_q2_nosex
+  
+)
+kable(AICs) 
+
+```
+:::
+
+*AIC is reduced the most for model with no sex, so will move forward with this model.* 
+```{r}
+#| tbl-cap: "Table of model with sex removed"
+#| label: tbl-table_7
+#| echo: false  
+#| message: false 
+#| fig-pos: "H"  
+
+tab_model(
+  fit_logit_q2_nosex,
+  show.ci = 0.95,
+  show.aic = TRUE,
+  transform = "exp"
+)
+
+```
+
+*Insert interpretation of chosen model, eg. look at what the odds of someone in age group 51-64, with a HNC/D or equiv in education being obese. Also comment on p-values and how they are all significant.*
+
+```{r}
+#| echo: false 
+#| fig-cap: "Plot of odds of chosen model" 
+#| label: fig-8
+#| message: false 
+#| warning: false 
+#| fig-align: center 
+#| fig-height: 4
+#| fig-width: 4
+
+plot_model(fit_logit_q2_nosex, show.values = TRUE)
+
+```
+
+```{r}
+#| echo: false 
+#| fig-cap: "Model Diagnostics" 
+#| label: fig-9
+#| message: false 
+#| warning: false 
+#| fig-align: center 
+#| fig-height: 4
+#| fig-width: 4
+
+check_model(
+  fit_logit_q2_nosex,
+  check = c("pp_check", "binned_residuals", "outliers", "qq")
+)
+
+```
+
+
+

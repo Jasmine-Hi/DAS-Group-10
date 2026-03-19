@@ -131,7 +131,7 @@ To assess whether obesity prevalence changed across survey years, a logistic reg
 
 ```{r}
 #| tbl-cap: "Model summary with 2008 as baseline"
-#| label: tbl-table_6
+#| label: tbl-table_2
 #| echo: false  
 #| message: false 
 #| fig-pos: "H"

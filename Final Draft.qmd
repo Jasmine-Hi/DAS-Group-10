@@ -195,7 +195,8 @@ plot_model(fit_logit_only_year,
 #| warning: false 
 #| fig-align: center 
 #| fig-height: 2
-#| fig-width: 2
+#| fig-width: 2 
+#| fig-pos: "H"
 
 pred_results1 <- fit_logit_only_year %>% 
   broom::augment(type.predict = "response") %>% 
@@ -319,7 +320,7 @@ Overall, these results suggest that age and education are important factors in e
 #| message: false 
 #| warning: false 
 #| fig-align: center 
-#| fig-height: 4
+#| fig-height: 3
 #| fig-width: 4
 #| fig-pos: "H"
 

@@ -125,7 +125,7 @@ From our exploratory analysis, we suspect that the prevalence of obesity is simi
 
 ## Formal Analysis
 
-### Question 1 
+### Investigating changes in prevalence of obesity in Scotland over the years 2008-2012
 
 A logistic regression model was fitted to assess whether obesity prevalence changed across survey years, with obesity status as the binary response variable and year as the explanatory variable, using 2008 as the baseline category. This model is appropriate because the response variable takes two possible values: obese or not obese.
 
@@ -147,7 +147,6 @@ fit_logit_only_year %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NUL
 
 ```
 
-**Fitted Formula:**
 
 $$
 \ln(\frac{p}{1-p}) = -0.87 + -0.04\cdot \mathbb{I}(\text{Year}=2009) + 0.04\cdot \mathbb I(\text{Year}=2010) + 0.00\cdot \mathbb I(\text{Year}=2011) + 0.00\cdot \mathbb I(\text{Year}=2012)
@@ -211,7 +210,7 @@ roc_curve(pred_results1,
 @fig-7 is the Receiver Operating Characteristic curve (ROC), this allows us to evaluate the performance of our model. Since the ROC curve is on the diagonal line, the performance of the model is no better than random guessing. Indicating that the year the study was taken is not a good indicator of whether someone is obese or not.
 
 
-### Question 2 
+### Investigating the differences in obesity by age, gender, socio-economic status and lifestyle factors 
 
 
 To investigate whether obesity differs by demographic characteristics, a logistic regression model was fitted with obesity status as the binary response variable and AgeGroup, Education, and Sex as explanatory variables. This allows the probability of obesity to be modelled as a function of these characteristics.
@@ -225,7 +224,7 @@ $$
 \bf{x}_i=\begin{pmatrix}1\\x_{35-50}\\x_{51-64}\\x_{65+}\\x_{\text{edu=higher}}\\⋮\\x_{\text{edu=standard}}\\x_{\text{male}}\end{pmatrix}\,\,\,\,\boldsymbol\beta=\begin{pmatrix}\alpha\\\beta_{38-50}\\\beta{51-64}\\\beta_{65+}\\\beta_{\text{edu=higher}}\\⋮\\\beta_{\text{edu=standard}}\\\beta_{\text{male}}\end{pmatrix}
 $$ 
 
-where the reference categories for age group, education and sex are 0-37, degree or higher and female, respectively. @tbl-table_4 contains the fitted model.
+where the reference categories for age group, education and sex are 0-37, degree or higher and female, respectively. @tbl-table_4 contains the details of the fitted model.
 
 ```{r}
 #| tbl-cap: "Model summary of Obesity with Agegroup, Sex and Education"

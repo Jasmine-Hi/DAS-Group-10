@@ -9,7 +9,7 @@ format:
 ---
 
 ## Introduction
-Obesity is a significant public health concern due to its association with various long-term health conditions and increased pressure on healthcare systems. The Scottish Health Survey monitors the health of individuals living in private households in Scotland and provides data that can be used to examine trends in obesity over time. This analysis uses data from the 2008-2012 surveys, including information on age, sex, education, and BMI classification. A binary obesity variable was created from the BMIgroup variable. The aim of this report is to investigate whether obesity prevalence has changed across survey years and whether it differs by demographic characteristics such as age, gender, and education. 
+Obesity is a significant public health concern due to its association with various long-term health conditions and increased pressure on healthcare systems. The Scottish Health Survey monitors the health of individuals living in private households in Scotland and provides data that can be used to examine trends in obesity over time. This analysis uses data from the 2008–2012 surveys, comprising 25,224 observations, including information on age, sex, education, and BMI classification. A binary obesity variable was created from the BMIgroup variable. The aim of this report is to investigate whether obesity prevalence has changed across survey years and whether it differs by demographic characteristics such as age, gender, and education.
 
 ## Exploratory analysis
 
@@ -127,7 +127,7 @@ From our exploratory analysis, we suspect that the prevalence of obesity is simi
 
 ### Question 1 
 
-To assess whether obesity prevalence changed across survey years, a logistic regression model was fitted with obesity status as the binary response variable and year as the explanatory variable, using 2008 as the baseline category. This model is appropriate because the response variable takes two possible values: obese or not obese.
+A logistic regression model was fitted to assess whether obesity prevalence changed across survey years, with obesity status as the binary response variable and year as the explanatory variable, using 2008 as the baseline category. This model is appropriate because the response variable takes two possible values: obese or not obese.
 
 ```{r}
 #| tbl-cap: "Model summary with 2008 as baseline"
@@ -230,7 +230,7 @@ roc_curve(pred_results1,
 ### Question 2 
 
 
-*Insert General formula for model* 
+To investigate whether obesity differs by demographic characteristics, a logistic regression model was fitted with obesity status as the binary response variable and AgeGroup, Education, and Sex as explanatory variables. This allows the probability of obesity to be modelled as a function of these characteristics.
 ```{r}
 #| tbl-cap: "Model summary of Obesity with Agegroup, Sex and Education"
 #| label: tbl-table_4
@@ -258,7 +258,7 @@ tab_model(
 
 ```
 
-*Since p-value of Sex[Male] is greater than 0.05, will remove from model, will then compare the AIC of each model to determine which is best* 
+The initial model included AgeGroup, Education, and Sex. The coefficient for Sex was not statistically significant (p = 0.328), suggesting no evidence of a difference in obesity between males and females. Therefore, Sex was removed from the model. We will then compare the AIC of each model to determine which is best.
 
 :::layout(ncol="2")
 ```{r}
@@ -306,7 +306,8 @@ kable(AICs)
 ```
 :::
 
-*AIC is reduced the most for model with no sex, so will move forward with this model.* 
+Comparing model fit using AIC shows that the reduced model without Sex has a slightly lower AIC, indicating a better fit. The reduced model is therefore selected.
+
 ```{r}
 #| tbl-cap: "Table of model with sex removed"
 #| label: tbl-table_7
@@ -323,7 +324,11 @@ tab_model(
 
 ```
 
-*Insert interpretation of chosen model, eg. look at what the odds of someone in age group 51-64, with a HNC/D or equiv in education being obese. Also comment on p-values and how they are all significant.*
+The results of the final model indicate that both age and education are significant predictors of obesity. Compared to the baseline age group (0–37), individuals aged 38–50 have 1.69 times higher odds of being obese, those aged 51–64 have approximately twice the odds (OR = 2.00), and those aged 65+ have 1.70 times higher odds. This suggests that obesity prevalence increases with age, particularly for individuals aged 51–64.
+
+Education also shows a clear association with obesity. Compared to individuals with a degree or higher, those with lower levels of education have higher odds of obesity. For example, individuals with no qualifications have 1.55 times higher odds of being obese. All education categories are statistically significant (p < 0.05), indicating strong evidence that socio-economic status, as measured by education, is associated with obesity.
+
+Overall, these results suggest that age and education are important factors in explaining differences in obesity prevalence, while gender does not appear to have a significant effect.
 
 ```{r}
 #| echo: false 
@@ -355,6 +360,8 @@ check_model(
 )
 
 ```
+## Conclusion
 
+This analysis found no evidence that obesity prevalence in Scotland changed significantly between 2008 and 2012. However, significant differences in obesity were observed across age and education groups. Older individuals, particularly those aged 51–64, and individuals with lower levels of education had higher odds of obesity. There was no evidence of a difference in obesity between males and females. These findings highlight the importance of demographic and socio-economic factors in understanding obesity patterns in Scotland.
 
 

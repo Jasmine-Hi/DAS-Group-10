@@ -1,7 +1,8 @@
 ---
-title: "Final Draft"
+title: "An investigation into various factors that impact obesity in Scotland from 2008-2012"
 format: 
   pdf:
+    embed-resources: true
     fontsize: 9pt
     include-in-header: 
       text: |

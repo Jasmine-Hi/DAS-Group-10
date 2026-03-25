@@ -211,144 +211,113 @@ roc_curve(pred_results1,
   autoplot()
 ```
 
+### Investigating the differences in obesity by age, gender, socio-economic status and lifestyle factors 
 
-Posterior predictive check (Top-left):
-Compares the observed data (number of obese vs not obese) against the predicted number
-using simulated data. The values appear identical to predictions.
+$$
+y_i\sim \text{Bernoulli}(p_i)\\\text{logit}(p_i)=\bf{x}_i^\top\boldsymbol\beta, \,\,\,i=
+{1,...,25224}
+$$ where $\bf x^\top_i$ is a vector containing predictor variables and $\boldsymbol\beta$ is a vector of coefficient estimates. So that, 
 
-Binned residuals (Top-right):
-Bin the observations based on their fitted values, and average the residual
-value in each bin. The plots shows the average residual values versus the average
-fitted value for each bin. All residuals fall outside the error bounds
+$$
+\bf{x}_i=\begin{pmatrix}1\\x_{35-50}\\x_{51-64}\\x_{65+}\\x_{\text{edu=higher}}\\⋮\\x_{\text{edu=standard}}\\x_{\text{male}}\end{pmatrix}\,\,\,\,\boldsymbol\beta=\begin{pmatrix}\alpha\\\beta_{38-50}\\\beta{51-64}\\\beta_{65+}\\\beta_{\text{edu=higher}}\\⋮\\\beta_{\text{edu=standard}}\\\beta_{\text{male}}\end{pmatrix}
+$$  
 
-Influential observations (Bottom-left):
-This plot is used to identify influential observations. If any points in this plot
-fall outside of Cook’s distance (the dashed lines) then it is considered an influential
-observation. All values fall within the dashed lines.
-
-Uniformity of residuals (Bottom-right):
-Since our response is not normally distributed, residuals are not expected to be
-normally distributed either. Thus, we can use QQ plots to check the uniformity of
-residuals. The values fall exactly along the line.
-
+where the reference categories for age group, education and sex are 0-37, degree or higher and female, respectively. @tbl-table_4 contains the details of the fitted model.
 
 ```{r}
-# Logistic regression model:
-# Outcome: obesity status (1 = Obese)
-# Predictors: Age, Sex, Education
-# Binomial family with logit link models log-odds of obesity
+#| tbl-cap: "Model summary of Obesity with Agegroup, Sex and Education"
+#| label: tbl-table_4
+#| echo: false  
+#| message: false 
+#| fig-pos: "H"
+
+#Logistic regression model with all variables 
+
+fit_logit_q2 <- glm(
+  Obese ~ AgeGroup + Education + Sex,
+  data = data,
+  family = binomial
+)
+
+#Table of Full model 
+
+tab_model(
+  fit_logit_q2,
+  show.ci = 0.95,
+  show.aic = TRUE,
+  transform = "exp"
+)
 
 
-# Since all terms are categorical, fit the full model with multinomial, family = binomial
-model_full <- multinom(Obese ~ AgeGroup + Education + Sex, data = data, family = binomial)
+``` 
 
-# Table of full model summary
-model_full %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
-# Sex has p-value>0.05, so is removed
+```{r}
+#| tbl-cap: "Table comparing AIC values of null model, full model and reduced model (without Sex)"
+#| label: tbl-table_6
+#| echo: false  
+#| message: false 
+#| fig-pos: "H" 
 
-# Fit the final model, without Sex
-model_final <- multinom(Obese ~ AgeGroup + Education, data = data, family = binomial)
+# Null model (intercept only, no predictors)
+fit_logit_q2_null <- glm(
+  Obese ~ 1,
+  data = data,
+  family = binomial
+)
 
-# Table of final model summary
-model_final %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
-# All p-values<0.05, so the final model is good
-
-# Compare performance of model_final and model_full
-compare_performance(model_final,model_full,metrics = "AIC")
-# model_final has lower AIC
-
-# Log-odds for model_final
-plot_model(model_final, show.values = TRUE, transform = NULL,
-           title = "Log-Odds (Obese)", show.p = TRUE)
-
-check_model
-
-
-
-
-# # Fit logistic regression model without Year
-# # This model assesses whether Age, Sex, and Education
-# # are associated with obesity
-# fit_logit_without_year <- glm(
-#   Obese ~ AgeGroup + Sex + Education,
-#   data = data,
-#   family = binomial
-# )
-
-
-# # Fit logistic regression model including Year
-# # This model tests whether Year provides additional
-# # explanatory power beyond demographic variables
-# fit_logit_with_year <- glm(
-#   Obese ~ AgeGroup + Sex + Education + Year,
-#   data = data,
-#   family = binomial
-# )
-
-# Compare nested models using Likelihood Ratio Test
-# to assess whether adding Year significantly improves model fit
-anova(fit_logit_without_year, fit_logit_with_year, test="Chisq")
-
-
-# Compare AIC, fit_logit_without_year is lowest
-AIC(fit_logit_without_year, fit_logit_with_year, fit_logit_only_year)
-
-
-
-# Table of model summary
-fit_logit_without_year %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
-# Sex[Male] has p-value 0.328, so is not significant
-
-
-# Fit final model without Year and Sex
-fit_logit_final <- glm(
+#Model with sex removed
+fit_logit_q2_nosex <- glm(
   Obese ~ AgeGroup + Education,
   data = data,
   family = binomial
 )
 
-# Table of final model summary
-fit_logit_final %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
-# All p-values are less than 0.05, so all are significant
-
-
-
-plot_model(type = "pred",
-           fit_logit_final,
-           terms = "Education",
-           axis.title = c("Education Category",
-                          "Prob. of being obese"),
-           title = "Plot of Education coefficients")
-
-plot_model(type = "pred",
-           fit_logit_final,
-           terms = "AgeGroup",
-           axis.title = c("Age Group",
-                          "Prob. of being obese"),
-           title = "Plot of AgeGroup coefficients")
-
-plot_model(type = "pred",
-           fit_logit_final,
-           terms = c("AgeGroup", "Education"),
-           axis.title = c("Age Group",
-                          "Prob. of being obese", "Education"),
-           title = "Plot of AgeGroup and Education coefficients")
-
-
-# Point estimates of the log-odds for the final model with AgeGroup and Education
-plot_model(fit_logit_final, show.values = TRUE, transform = NULL,
-           title = "Log-Odds (Obese)", show.p = TRUE)
-
-
-check_model(fit_logit_final, check = c("pp_check","binned_residuals","outliers","qq"))
-# Binned residuals plot has most values outside error bounds
-# All other plots satisfy the assumptions
+AICs<-AIC(
+  fit_logit_q2_null,
+  fit_logit_q2,
+  fit_logit_q2_nosex
+  
+)
+kable(AICs) 
 
 ```
 
 
 
 
+```{r}
+#| tbl-cap: "Table of model with sex removed"
+#| label: tbl-table_7
+#| echo: false  
+#| message: false 
+#| fig-pos: "H"  
+
+tab_model(
+  fit_logit_q2_nosex,
+  show.ci = 0.95,
+  show.aic = TRUE,
+  transform = "exp"
+)
+
+```
+
+
+```{r}
+#| echo: false 
+#| fig-cap: "Plot of odds of chosen model" 
+#| label: fig-8
+#| message: false 
+#| warning: false 
+#| fig-align: center 
+#| fig-height: 3
+#| fig-width: 4
+#| fig-pos: "H"
+
+plot_model(fit_logit_q2_nosex, show.values = TRUE)
+
+``` 
+
+## Conclusion
 
 
 
@@ -366,7 +335,9 @@ check_model(fit_logit_final, check = c("pp_check","binned_residuals","outliers",
 
 
 
-1111
+
+
+
 
 
 

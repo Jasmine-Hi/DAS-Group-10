@@ -128,21 +128,51 @@ ggplot(data, aes(x = Obese, group = Education)) +
 From our exploratory analysis, we suspect that the prevalence of obesity is similar over the given years. As well as this, our exploratory analysis indicates there are some differences in obesity by age and socio-economic status or lifestyle factors, however there does not appear to be any major differences in obesity based on gender. We will investigate this further in our formal analysis.
 
 
-# Q1 logistic regression model:
+## Formal Analysis 
+
+### Investigating changes in prevalence of obesity in Scotland over the years 2008-2012 
+
+```{r}
+#| tbl-cap: "Model summary with 2008 as baseline"
+#| label: tbl-table_2
+#| echo: false  
+#| message: false 
+#| fig-pos: "H"
+
 fit_logit_only_year <- glm(Obese ~ Year,
                  data = data,
                  family = binomial)
 
 # Table of model summary with 2008 as a baseline
 fit_logit_only_year %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NULL)
-# All Year p-values greated than 0.05, so none are significant
+# All Year p-values greated than 0.05, so none are significant 
 
-# Model formula
-# ln(p/1-p) = -0.87 + -0.04*I(Year=2009) + 0.04*I(Year=2010)
+``` 
+$$
+\ln(\frac{p}{1-p}) = -0.87 + -0.04\cdot \mathbb{I}(\text{Year}=2009) + 0.04\cdot \mathbb I(\text{Year}=2010) + 0.00\cdot \mathbb I(\text{Year}=2011) + 0.00\cdot \mathbb I(\text{Year}=2012)
+$$ 
+
+::: {layout-ncol="2" fig-pos="H" fig-height="3" fig-width="4"}
+```{r}
+#| echo: false 
+#| fig-cap: "Point Estimates of log-odds"
+#| label: fig-5 
+#| message: false 
+#| warning: false 
 
 # Point estimates of the log-odds
 plot_model(fit_logit_only_year, show.values = TRUE, transform = NULL,
-           title = "Log-Odds (Obese)", show.p = TRUE)
+           title = "Log-Odds (Obese)", show.p = TRUE) 
+
+```
+
+```{r}
+#| echo: false 
+#| fig-cap: "Prob of being obese by year with CIs" 
+#| label: fig-6
+#| message: false 
+#| warning: false 
+#| fig-align: center
 
 # Probability of being obese by year with confidence intervals
 plot_model(fit_logit_only_year, 
@@ -150,11 +180,31 @@ plot_model(fit_logit_only_year,
            title = "", 
            terms="Year", 
            axis.title = c("Year", "Prob. of being obese"))
+``` 
+:::
 
+```{r}
+#| echo: false 
+#| fig-cap: "ROC curve" 
+#| label: fig-7
+#| message: false 
+#| warning: false 
+#| fig-align: center 
+#| fig-height: 2
+#| fig-width: 2 
+#| fig-pos: "H"
 
-check_model(fit_logit_only_year, check = c("pp_check","binned_residuals","outliers","qq"))
+pred_results1 <- fit_logit_only_year %>% 
+  broom::augment(type.predict = "response") %>% 
+  mutate(predicted_class = factor(ifelse(.fitted > 0.5, "Obese", "Not Obese"), levels = levels(Obese))) 
 
+roc_curve(pred_results1,
+          truth=Obese, 
+          .fitted,
+          event_level="second")%>%
+  autoplot()
 ```
+
 
 Posterior predictive check (Top-left):
 Compares the observed data (number of obese vs not obese) against the predicted number

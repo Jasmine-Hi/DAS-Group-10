@@ -153,6 +153,7 @@ $$
 \ln(\frac{p}{1-p}) = -0.87 + -0.04\cdot \mathbb{I}(\text{Year}=2009) + 0.04\cdot \mathbb I(\text{Year}=2010) + 0.00\cdot \mathbb I(\text{Year}=2011) + 0.00\cdot \mathbb I(\text{Year}=2012)
 $$ 
 The fitted model estimates the log-odds of obesity in each year relative to 2008. The intercept of -0.87 represents the log-odds of obesity in 2008. The coefficient for 2009 is -0.04, indicating slightly lower log-odds of obesity than in 2008, while the coefficient for 2010 is 0.04, indicating slightly higher log-odds. The coefficients for 2011 and 2012 are both approximately 0.00, suggesting almost no difference relative to 2008. However, all p-values are greater than 0.05, so none of these year effects are statistically significant. Therefore, there is no evidence that obesity prevalence differed significantly across the survey years considered. 
+
 ::: {layout-ncol="2" fig-pos="H" fig-height="3" fig-width="4"}
 ```{r}
 #| echo: false 
@@ -169,7 +170,7 @@ plot_model(fit_logit_only_year, show.values = TRUE, transform = NULL,
 
 ```{r}
 #| echo: false 
-#| fig-cap: "Prob of being obese by year with CIs" 
+#| fig-cap: "Probability of being obese by year with CIs" 
 #| label: fig-6
 #| message: false 
 #| warning: false 
@@ -183,6 +184,7 @@ plot_model(fit_logit_only_year,
            axis.title = c("Year", "Prob. of being obese"))
 ``` 
 :::
+
 @fig-5 displays the estimated log-odds of obesity for each year relative to the baseline year. The estimates are all close to zero and their confidence intervals overlap considerably, supporting the conclusion that there are no meaningful differences between years. @fig-6 shows the predicted probability of obesity for each survey year. The predicted probabilities remain relatively stable across years, ranging from approximately 28% to 31%, which is consistent with the exploratory analysis.
 ```{r}
 #| echo: false 
@@ -206,6 +208,7 @@ roc_curve(pred_results1,
   autoplot()
 ```
 @fig-7 is the Receiver Operating Characteristic curve (ROC), this allows us to evaluate the performance of our model. Since the ROC curve is on the diagonal line, the performance of the model is no better than random guessing. Indicating that the year the study was taken is not a good indicator of whether someone is obese or not.
+
 ### Investigating the differences in obesity by age, gender, socio-economic status and lifestyle factors 
 To investigate whether obesity differs by demographic characteristics, a logistic regression model was fitted with obesity status as the binary response variable and AgeGroup, Education, and Sex as explanatory variables. This allows the probability of obesity to be modelled as a function of these characteristics.
 $$

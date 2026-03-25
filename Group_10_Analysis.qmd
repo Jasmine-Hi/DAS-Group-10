@@ -10,15 +10,8 @@ format:
 ---
 
 
-# 1. Introduction
-
-This project analyses data from the Scottish Health Survey (2008–2012) to investigate obesity prevalence 
-and its association with demographic and socioeconomic factors.
-
-The main research questions are:
-
-1. Has obesity prevalence changed between 2008 and 2012?
-2. Is obesity associated with age, sex, and education level?
+## Introduction
+Obesity is a significant public health concern due to its association with various long-term health conditions and increased pressure on healthcare systems. The Scottish Health Survey monitors the health of individuals living in private households in Scotland and provides data that can be used to examine trends in obesity over time. This analysis uses data from the 2008–2012 surveys, comprising 25,224 observations, including information on age, sex, education, and BMI classification. A binary obesity variable was created from the BMIgroup variable. The aim of this report is to investigate whether obesity prevalence has changed across survey years and whether it differs by demographic characteristics such as age, gender, and education.
 
 
 ## Exploratory analysis
@@ -138,6 +131,8 @@ From our exploratory analysis, we suspect that the prevalence of obesity is simi
 
 ### Investigating changes in prevalence of obesity in Scotland over the years 2008-2012 
 
+A logistic regression model was fitted to assess whether obesity prevalence changed across survey years, with obesity status as the binary response variable and year as the explanatory variable, using 2008 as the baseline category. This model is appropriate because the response variable takes two possible values: obese or not obese.
+
 ```{r}
 #| tbl-cap: "Model summary with 2008 as baseline"
 #| label: tbl-table_2
@@ -157,7 +152,7 @@ fit_logit_only_year %>% tab_model(show.ci = 0.95, show.aic=TRUE, transform = NUL
 $$
 \ln(\frac{p}{1-p}) = -0.87 + -0.04\cdot \mathbb{I}(\text{Year}=2009) + 0.04\cdot \mathbb I(\text{Year}=2010) + 0.00\cdot \mathbb I(\text{Year}=2011) + 0.00\cdot \mathbb I(\text{Year}=2012)
 $$ 
-
+The fitted model estimates the log-odds of obesity in each year relative to 2008. The intercept of -0.87 represents the log-odds of obesity in 2008. The coefficient for 2009 is -0.04, indicating slightly lower log-odds of obesity than in 2008, while the coefficient for 2010 is 0.04, indicating slightly higher log-odds. The coefficients for 2011 and 2012 are both approximately 0.00, suggesting almost no difference relative to 2008. However, all p-values are greater than 0.05, so none of these year effects are statistically significant. Therefore, there is no evidence that obesity prevalence differed significantly across the survey years considered. 
 ::: {layout-ncol="2" fig-pos="H" fig-height="3" fig-width="4"}
 ```{r}
 #| echo: false 
@@ -188,7 +183,7 @@ plot_model(fit_logit_only_year,
            axis.title = c("Year", "Prob. of being obese"))
 ``` 
 :::
-
+@fig-5 displays the estimated log-odds of obesity for each year relative to the baseline year. The estimates are all close to zero and their confidence intervals overlap considerably, supporting the conclusion that there are no meaningful differences between years. @fig-6 shows the predicted probability of obesity for each survey year. The predicted probabilities remain relatively stable across years, ranging from approximately 28% to 31%, which is consistent with the exploratory analysis.
 ```{r}
 #| echo: false 
 #| fig-cap: "ROC curve" 
@@ -210,9 +205,9 @@ roc_curve(pred_results1,
           event_level="second")%>%
   autoplot()
 ```
-
+@fig-7 is the Receiver Operating Characteristic curve (ROC), this allows us to evaluate the performance of our model. Since the ROC curve is on the diagonal line, the performance of the model is no better than random guessing. Indicating that the year the study was taken is not a good indicator of whether someone is obese or not.
 ### Investigating the differences in obesity by age, gender, socio-economic status and lifestyle factors 
-
+To investigate whether obesity differs by demographic characteristics, a logistic regression model was fitted with obesity status as the binary response variable and AgeGroup, Education, and Sex as explanatory variables. This allows the probability of obesity to be modelled as a function of these characteristics.
 $$
 y_i\sim \text{Bernoulli}(p_i)\\\text{logit}(p_i)=\bf{x}_i^\top\boldsymbol\beta, \,\,\,i=
 {1,...,25224}
@@ -222,7 +217,7 @@ $$
 \bf{x}_i=\begin{pmatrix}1\\x_{35-50}\\x_{51-64}\\x_{65+}\\x_{\text{edu=higher}}\\⋮\\x_{\text{edu=standard}}\\x_{\text{male}}\end{pmatrix}\,\,\,\,\boldsymbol\beta=\begin{pmatrix}\alpha\\\beta_{38-50}\\\beta{51-64}\\\beta_{65+}\\\beta_{\text{edu=higher}}\\⋮\\\beta_{\text{edu=standard}}\\\beta_{\text{male}}\end{pmatrix}
 $$  
 
-where the reference categories for age group, education and sex are 0-37, degree or higher and female, respectively. @tbl-table_4 contains the details of the fitted model.
+Where the reference categories for age group, education and sex are 0-37, degree or higher and female, respectively. @tbl-table_4 contains the details of the fitted model.
 
 ```{r}
 #| tbl-cap: "Model summary of Obesity with Agegroup, Sex and Education"
@@ -250,7 +245,7 @@ tab_model(
 
 
 ``` 
-
+The initial model included AgeGroup, Education, and Sex. The coefficient for Sex was not statistically significant (p = 0.328), suggesting no evidence of a difference in obesity between males and females. Therefore, Sex was removed from the model. We will then compare the AIC of each model to determine which is best.
 ```{r}
 #| tbl-cap: "Table comparing AIC values of null model, full model and reduced model (without Sex)"
 #| label: tbl-table_6
@@ -281,9 +276,7 @@ AICs<-AIC(
 kable(AICs) 
 
 ```
-
-
-
+Comparing model fit using AIC shows that the reduced model without Sex has a slightly lower AIC, indicating a better fit. The reduced model is therefore selected.
 
 ```{r}
 #| tbl-cap: "Table of model with sex removed"
@@ -300,7 +293,11 @@ tab_model(
 )
 
 ```
+The results of the final model indicate that both age and education are significant predictors of obesity. Compared to the baseline age group (0–37), individuals aged 38–50 have 1.69 times higher odds of being obese, those aged 51–64 have approximately twice the odds (OR = 2.00), and those aged 65+ have 1.70 times higher odds. This suggests that obesity prevalence increases with age, particularly for individuals aged 51–64.
 
+Education also shows a clear association with obesity. Compared to individuals with a degree or higher, those with lower levels of education have higher odds of obesity. For example, individuals with no qualifications have 1.55 times higher odds of being obese. All education categories are statistically significant (p < 0.05), indicating strong evidence that socio-economic status, as measured by education, is associated with obesity.
+
+Overall, these results suggest that age and education are important factors in explaining differences in obesity prevalence, while gender does not appear to have a significant effect.
 
 ```{r}
 #| echo: false 
@@ -318,8 +315,7 @@ plot_model(fit_logit_q2_nosex, show.values = TRUE)
 ``` 
 
 ## Conclusion
-
-
+This analysis found no evidence that obesity prevalence in Scotland changed significantly between 2008 and 2012. However, significant differences in obesity were observed across age and education groups. Older individuals, particularly those aged 51–64, and individuals with lower levels of education had higher odds of obesity. There was no evidence of a difference in obesity between males and females. These findings highlight the importance of demographic and socio-economic factors in understanding obesity patterns in Scotland.
 
 
 

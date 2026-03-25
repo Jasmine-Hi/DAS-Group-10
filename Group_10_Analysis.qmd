@@ -1,8 +1,14 @@
 ---
-title: "Project 10 – Obesity Prevalence"
-author: Jasmine
-format: html
+title: "An investigation into various factors that impact obesity in Scotland from 2008-2012"
+format: 
+  pdf:
+    embed-resources: true
+    fontsize: 9pt
+    include-in-header: 
+      text: |
+        \usepackage{float}
 ---
+
 
 # 1. Introduction
 

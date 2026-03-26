@@ -212,7 +212,7 @@ roc_curve(pred_results1,
 ### Investigating the differences in obesity by age, gender, socio-economic status and lifestyle factors 
 To investigate whether obesity differs by demographic characteristics, a logistic regression model was fitted with obesity status as the binary response variable and AgeGroup, Education, and Sex as explanatory variables. This allows the probability of obesity to be modelled as a function of these characteristics.
 $$
-y_i\sim \text{Bernoulli}(p_i)\\\text{logit}(p_i)=\bf{x}_i^\top\boldsymbol\beta, \,\,\,i=
+y_i\sim \text{Bernoulli}(p_i)\\ \text{logit}(p_i)=\bf{x}_i^\top\boldsymbol\beta, \,\,\,i=
 {1,...,25224}
 $$ where $\bf x^\top_i$ is a vector containing predictor variables and $\boldsymbol\beta$ is a vector of coefficient estimates. So that, 
 
